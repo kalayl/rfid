@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rfid", "rfid.csproj", "{E14C72AA-B87E-46F4-BA9C-E4EA3882740E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spike", "spike\spike.csproj", "{E14C72AA-B87E-46F4-BA9C-E4EA3882740E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

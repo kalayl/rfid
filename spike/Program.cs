@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -14,7 +15,7 @@ namespace rfid
         /// <summary>
         /// IP Address of the reader
         /// </summary>
-        private string m_ipAddress = "192.168.0.118";
+        private string m_ipAddress = "192.168.0.122";
 
         /// <summary>
         /// Constructor
@@ -82,13 +83,12 @@ namespace rfid
                 if (!readerManager.EventsUnregister(id, "event.tag.report"))
                     throw new Exception("Failure to unregister for event: " + readerManager.LastErrorMessage);
                 Console.WriteLine("Unregistered for event.tag.report");
-
+               
                 // Close the connection
                 setupManager = null;
                 readerManager = null;
                 dataManager.Close();
                 Console.WriteLine("Connection Closed");
-                Console.ReadLine();
             }
             catch (Exception exc)
             {
@@ -112,7 +112,11 @@ namespace rfid
             // Execute the application
             prog.Run();
             Console.WriteLine("Exiting");
+            Console.ReadLine();
         }
+
+        private float min = 360;
+        private float max = 0;
 
         /// <summary>
         /// EventFound delegate is used to notify interested entities whenever an 
@@ -123,9 +127,26 @@ namespace rfid
             if (eventInfo.Type == EventInfo.EventTypes.TAG_REPORT)
             {
                 string tagid = eventInfo.GetParameter(EventInfo.EventTagReportParams.TagId);
+                string phase = eventInfo.GetParameter(EventInfo.EventTagReportParams.Phase);
+                string antenna = eventInfo.GetParameter(EventInfo.EventTagReportParams.Antenna);
+                string time = eventInfo.GetParameter(EventInfo.EventTagReportParams.Time);
+                Convert.ToInt32(phase);
+                var i = Int16.Parse(phase.Substring(2), NumberStyles.HexNumber);
+                var f = ((float) i)/32768*360;
+                if (f > max)
+                {
+                    max = f;
+                }
+                if (f < min)
+                {
+                    min = f;
+                }
+                
                 if (tagid != null)
-                    Console.WriteLine("TagID: " + tagid);
+                    Console.WriteLine("TagID: {0}; Antenna: {1}; Time: {2} ", tagid, antenna, time);
+                    Console.WriteLine("Phase: {0}; phase-deg: {1}; max: {2}; min: {3} ", phase, f, max, min);
             }
+            
         }
     }
 }
