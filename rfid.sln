@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spike", "spike\spike.csproj", "{E14C72AA-B87E-46F4-BA9C-E4EA3882740E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reader", "Reader\Reader.csproj", "{07A3B98A-F22C-4CD3-83A8-D07E2652136B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{E14C72AA-B87E-46F4-BA9C-E4EA3882740E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E14C72AA-B87E-46F4-BA9C-E4EA3882740E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E14C72AA-B87E-46F4-BA9C-E4EA3882740E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07A3B98A-F22C-4CD3-83A8-D07E2652136B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07A3B98A-F22C-4CD3-83A8-D07E2652136B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07A3B98A-F22C-4CD3-83A8-D07E2652136B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07A3B98A-F22C-4CD3-83A8-D07E2652136B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

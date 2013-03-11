@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using Sirit.Data;
-using Sirit.Driver;
+using Reader;
 using Sirit.Mapping;
 
 namespace rfid
@@ -40,55 +36,18 @@ namespace rfid
         {
             try
             {
-                // Open a connection to the reader
-                DataManager dataManager = new DataManager(DataManager.ConnectionTypes.SOCKET, m_ipAddress, 0);
-                dataManager.OpenConnection();
-                Console.WriteLine("Connection Opened");
-
-                // Get the reader's name
-                InfoManager infoManager = new InfoManager(dataManager);
-                String v = infoManager.Name;
-                Console.WriteLine("Name: " + v);
-                infoManager = null;
-
-                // Login as administrator
-                ReaderManager readerManager = new ReaderManager(dataManager);
-                if (!readerManager.Login("admin", "readeradmin"))
-                    throw new Exception("Login attempt failed: " + readerManager.LastErrorMessage);
-                v = readerManager.WhoAmI();
-                Console.WriteLine("Login: " + v);
-
-                // Open an event channel and get it's ID
-                String id = dataManager.GetEventChannel(new EventFound(EventReceivedHandler));
-                Console.WriteLine("Event Channel ID: " + id);
-
-                // Register for event.tag.report
-                if (!readerManager.EventsRegister(id, "event.tag.report"))
-                    throw new Exception("Failure to register for event: " + readerManager.LastErrorMessage);
-                Console.WriteLine("Registered for event.tag.report");
-
-                // Set operating mode to active
-                SetupManager setupManager = new SetupManager(dataManager);
-                setupManager.OperatingMode = SetupManager.OperatingModeTypes.ACTIVE;
-                Console.WriteLine("Operating Mode: Active");
+                var readerService = new ReaderService(m_ipAddress, "admin", "readeradmin");
+                readerService.Activate();
+                var eventRegistrationId = readerService.RegisterHandler("event.tag.report", EventReceivedHandler);
+               
 
                 // Sleep while handling tag events
                 Thread.Sleep(500);
 
-                // Set operating mode to standby
-                setupManager.OperatingMode = SetupManager.OperatingModeTypes.STANDBY;
-                Console.WriteLine("Operating Mode: Standby");
+                readerService.Standby();
 
-                // Unregister for event.tag.report
-                if (!readerManager.EventsUnregister(id, "event.tag.report"))
-                    throw new Exception("Failure to unregister for event: " + readerManager.LastErrorMessage);
-                Console.WriteLine("Unregistered for event.tag.report");
-               
-                // Close the connection
-                setupManager = null;
-                readerManager = null;
-                dataManager.Close();
-                Console.WriteLine("Connection Closed");
+                readerService.UnregisterHandler(eventRegistrationId, "event.tag.report");
+                readerService.Close();
             }
             catch (Exception exc)
             {
@@ -130,9 +89,19 @@ namespace rfid
                 string phase = eventInfo.GetParameter(EventInfo.EventTagReportParams.Phase);
                 string antenna = eventInfo.GetParameter(EventInfo.EventTagReportParams.Antenna);
                 string time = eventInfo.GetParameter(EventInfo.EventTagReportParams.Time);
-                Convert.ToInt32(phase);
+
+                var a = Convert.ToInt32(phase, 16);
+                Console.WriteLine(a);
+                if (a > 32768)
+                {
+                    a = a - 32768;
+                }
+                float phasea = (float)(((float)a) / 32768) * 180;
+                Console.WriteLine(phasea);
+                
+
                 var i = Int16.Parse(phase.Substring(2), NumberStyles.HexNumber);
-                var f = ((float) i)/32768*360;
+                var f = ((float)i) / 32768 * 360;
                 if (f > max)
                 {
                     max = f;
@@ -141,10 +110,12 @@ namespace rfid
                 {
                     min = f;
                 }
-                
+
                 if (tagid != null)
-                    Console.WriteLine("TagID: {0}; Antenna: {1}; Time: {2} ", tagid, antenna, time);
-                    Console.WriteLine("Phase: {0}; phase-deg: {1}; max: {2}; min: {3} ", phase, f, max, min);
+                {
+                    //Console.WriteLine("TagID: {0}; Antenna: {1}; Time: {2} ", tagid, antenna, time);
+                    Console.WriteLine("Phase: {0}; phase-deg: {1}; max: {2}; min: {3} ", phase, phasea, max, min);
+                }
             }
             
         }
