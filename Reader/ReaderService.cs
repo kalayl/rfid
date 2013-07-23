@@ -47,8 +47,6 @@ namespace Reader
 
             v = _readerManager.WhoAmI();
             Console.WriteLine("Login: " + v);
-
-            
         }
 
         public void Close()
