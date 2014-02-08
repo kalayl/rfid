@@ -11,7 +11,8 @@ namespace Reader
             {
                 a = a - 32768;
             }
-            float phasea = (float)(((float)a) / 32768) * 180;
+            
+            var phasea = (((float)a) / 32768) * 180;
 
             return phasea;
         }

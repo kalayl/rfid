@@ -5,7 +5,17 @@ using Sirit.Mapping;
 
 namespace Reader
 {
-    public class ReaderService
+    public interface IReaderService
+    {
+        void Activate();
+        void Standby();
+        void Close();
+
+        string RegisterHandler(string tagEventName, EventFound eventReceivedHandler);
+        void UnregisterHandler(string eventRegistrationId, string tagEventName);
+    }
+
+    public class ReaderService : IReaderService
     {
         private readonly string _ipAddress;
         private readonly string _login;
@@ -30,12 +40,12 @@ namespace Reader
             // Open a connection to the reader
             _dataManager = new DataManager(DataManager.ConnectionTypes.SOCKET, _ipAddress, 0);
             _dataManager.OpenConnection();
-            Console.WriteLine("Connection Opened");
+            //Console.WriteLine("Connection Opened");
 
             // Get the reader's name
             _infoManager = new InfoManager(_dataManager);
             String v = _infoManager.Name;
-            Console.WriteLine("Name: " + v);
+            //Console.WriteLine("Name: " + v);
             _infoManager = null;
 
             // Login as administrator
@@ -46,7 +56,7 @@ namespace Reader
             }
 
             v = _readerManager.WhoAmI();
-            Console.WriteLine("Login: " + v);
+            //Console.WriteLine("Login: " + v);
         }
 
         public void Close()
@@ -57,19 +67,19 @@ namespace Reader
             _infoManager = null;
 
             _dataManager.Close();
-            Console.WriteLine("Connection Closed");
+            //Console.WriteLine("Connection Closed");
         }
 
         public String RegisterHandler(string tagEventName, EventFound eventReceivedHandler)
         {
             // Open an event channel and get it's ID
             String id = _dataManager.GetEventChannel(eventReceivedHandler);
-            Console.WriteLine("Event Channel ID: " + id);
+            //Console.WriteLine("Event Channel ID: " + id);
 
             // Register for event.tag.report
             if (!_readerManager.EventsRegister(id, tagEventName))
                 throw new Exception("Failure to register for event: " + _readerManager.LastErrorMessage);
-            Console.WriteLine("Registered for " + tagEventName);
+            //Console.WriteLine("Registered for " + tagEventName);
 
             return id;
         }
@@ -79,14 +89,14 @@ namespace Reader
             // Set operating mode to active
             _setupManager = new SetupManager(_dataManager);
             _setupManager.OperatingMode = SetupManager.OperatingModeTypes.ACTIVE;
-            Console.WriteLine("Operating Mode: Active");
+            //Console.WriteLine("Operating Mode: Active");
         }
 
         public void Standby()
         {
             // Set operating mode to standby
             _setupManager.OperatingMode = SetupManager.OperatingModeTypes.STANDBY;
-            Console.WriteLine("Operating Mode: Standby");
+            //Console.WriteLine("Operating Mode: Standby");
         }
 
         public void UnregisterHandler(string eventRegistrationId, string tagEventName)
@@ -94,7 +104,7 @@ namespace Reader
             // Unregister for event.tag.report
             if (!_readerManager.EventsUnregister(eventRegistrationId, tagEventName))
                 throw new Exception("Failure to unregister for event: " + _readerManager.LastErrorMessage);
-            Console.WriteLine("Unregistered for " + tagEventName);
+            //Console.WriteLine("Unregistered for " + tagEventName);
         }
     }
 }
